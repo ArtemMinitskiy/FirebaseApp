@@ -56,13 +56,15 @@ fun InviteListScreen(
                     it,
                     accept = {
                         Log.i("mLogFire", "Accept Invite From User: ${it.name}")
+                        val roomRef = db.collection(ROOMS).document()
+                        val roomId = roomRef.id
 
                         val room = Room(
+                            id = roomId,
                             roomName = "Private Room",
                             createdBy = userData.value.uid,
                             participants = listOf(userData.value.uid, it.uid)
                         )
-                        val roomRef = db.collection(ROOMS).document()
                         Log.i("mLogFire", "Invite ID: ${invite.value.inviteId}")
                         roomRef.set(room).addOnSuccessListener {
                             val inviteRef =

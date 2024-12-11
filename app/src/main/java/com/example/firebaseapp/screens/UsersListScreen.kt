@@ -32,7 +32,7 @@ fun UsersListScreen(
     LaunchedEffect(Unit) {
         getUsersList(db, userData.value.uid) { user ->
             users.clear()
-            Log.e("mLogFire", "New User: $user")
+//            Log.e("mLogFire", "New User: $user")
             users.add(user)
         }
     }

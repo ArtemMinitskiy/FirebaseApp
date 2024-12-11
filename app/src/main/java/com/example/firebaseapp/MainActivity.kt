@@ -1,18 +1,15 @@
 package com.example.firebaseapp
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExitTransition
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -31,12 +28,12 @@ import com.cleanease.optimize.navigation.NavigationItem
 import com.example.firebaseapp.firebase.addUser
 import com.example.firebaseapp.firebase.rememberFirebaseAuthLauncher
 import com.example.firebaseapp.model.User
+import com.example.firebaseapp.screens.ChatRoomScreen
 import com.example.firebaseapp.screens.InviteListScreen
 import com.example.firebaseapp.screens.RoomsListScreen
 import com.example.firebaseapp.screens.SignInScreen
 import com.example.firebaseapp.screens.UsersListScreen
 import com.example.firebaseapp.ui.theme.FirebaseAppTheme
-import com.example.firebaseapp.ui.theme.Orange
 import com.example.firebaseapp.ui.theme.PurpleGrey40
 import com.example.firebaseapp.utils.noRippleClickable
 import com.example.firebaseapp.views.UserToolbar
@@ -54,7 +51,7 @@ class MainActivity : ComponentActivity() {
             val userData = remember { mutableStateOf(User()) }
 
             LaunchedEffect(user.value) {
-                Log.i("mLogFire", "User: ${user.value?.uid}")
+//                Log.i("mLogFire", "User: ${user.value?.uid}")
                 user.value?.providerData?.let { data ->
                     userData.value = User(
                         uid = user.value?.uid.toString(),
@@ -135,7 +132,12 @@ class MainActivity : ComponentActivity() {
                             InviteListScreen(userData, db)
                         }
                         composable(NavigationItem.RoomsList.route) {
-                            RoomsListScreen(userData, db)
+                            RoomsListScreen(userData, db) {
+                                navController.navigate(NavigationItem.Rooms.route)
+                            }
+                        }
+                        composable(NavigationItem.Rooms.route) {
+                            ChatRoomScreen(userData, db)
                         }
                     }
                 }

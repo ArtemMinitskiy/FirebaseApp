@@ -5,10 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,21 +20,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
+import com.example.firebaseapp.model.Message
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.MESSAGES
+import com.example.firebaseapp.utils.Constants.ROOMS
 import com.example.firebaseapp.utils.Constants.USERS
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ChatRoomScreen(
-    user: MutableState<FirebaseUser?>,
     userData: MutableState<User>,
-    db: FirebaseFirestore
+    db: FirebaseFirestore,
 ) {
     val messages = remember { mutableStateListOf<String>() }
-    val message = remember { mutableStateOf("") }
+    val text = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         db.collection(MESSAGES)
@@ -70,23 +67,6 @@ fun ChatRoomScreen(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-
-        Row(
-            modifier = Modifier
-                .wrapContentHeight()
-                .padding(start = 16.dp, top = 8.dp)
-        ) {
-            AsyncImage(
-                model = userData.value.picture,
-                contentDescription = "Image from File",
-                modifier = Modifier
-                    .size(60.dp),
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(userData.value.name)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
         LazyColumn(modifier = Modifier.wrapContentHeight()) {
             items(messages) { msg ->
                 Text(text = msg, modifier = Modifier.padding(8.dp))
@@ -95,19 +75,15 @@ fun ChatRoomScreen(
         Spacer(modifier = Modifier.weight(1f))
         Row(modifier = Modifier.wrapContentHeight()) {
             TextField(
-                value = message.value,
-                onValueChange = { message.value = it },
+                value = text.value,
+                onValueChange = { text.value = it },
                 modifier = Modifier.weight(1f)
             )
             Button(onClick = {
-                db.collection(MESSAGES).add(
-                    mapOf(
-                        "text" to message.value,
-                        "user" to user.value?.displayName,
-                        "timestamp" to System.currentTimeMillis()
-                    )
-                )
-                message.value = ""
+//                val message = Message(senderId = userData.value.uid, content = text.value, timestamp = System.currentTimeMillis())
+//                db.collection(ROOMS).document(roomId).collection(MESSAGES).add(message)
+
+                text.value = ""
             }) {
                 Text(text = "Send")
             }
