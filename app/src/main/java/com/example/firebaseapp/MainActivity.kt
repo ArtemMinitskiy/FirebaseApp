@@ -4,16 +4,28 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.cleanease.optimize.navigation.NavigationItem
+import com.example.firebaseapp.model.User
+import com.example.firebaseapp.screens.SignInScreen
+import com.example.firebaseapp.screens.UsersListScreen
 import com.example.firebaseapp.ui.theme.FirebaseAppTheme
+import com.example.firebaseapp.views.UserToolbar
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -21,13 +33,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val navController = rememberNavController()
             val user = remember { mutableStateOf(Firebase.auth.currentUser) }
             val db = Firebase.firestore
-//            val db = FirebaseFirestore.getInstance()
             val userData = remember { mutableStateOf(User()) }
 
             LaunchedEffect(user.value) {
-                Log.i("mLogFire", "user ${user.value?.uid}")
+                Log.i("mLogFire", "User: ${user.value?.uid}")
                 user.value?.providerData?.forEach {
                     userData.value = User(
                         uid = user.value?.uid.toString(),
@@ -53,34 +65,39 @@ class MainActivity : ComponentActivity() {
                             listOfRooms = arrayListOf()
                         )
                     ).addOnSuccessListener {
-                        Log.e("mLogFire", "Success")
+                        Log.e("mLogFire", "Add User Success")
                     }.addOnFailureListener { e ->
-                        Log.e("mLogFire", "Failure $e")
+                        Log.e("mLogFire", "Add User Failure $e")
                     }
-//                    val room_uid = "${userData.value.uid}_it.uid"
-//                    Log.i("mLogFire", "Room UID: $room_uid")
-//                    val room = Room(
-//                        id = room_uid,
-//                        roomCreatorUid = userData.value.uid,
-//                        listOfUsersId = listOf(userData.value.uid, "ewfwefwef")
-//                    )
-//                    db.collection("rooms").document(room_uid).set(room)
                 },
                 onAuthError = {
                     user.value = null
                 }
             )
             FirebaseAppTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    if (user.value == null) {
-                        SignInScreen(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
-                            user, launcher
-                        )
-                    } else {
-                        UsersListScreen(user, userData, db)
+                Column {
+                    UserToolbar(userData)
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    NavHost(navController = navController,
+                        startDestination = if (user.value == null) NavigationItem.SignIn.route else NavigationItem.UsersList.route,
+                        exitTransition = {
+                            ExitTransition.None
+                        },
+                        popExitTransition = {
+                            ExitTransition.None
+                        }
+                    ) {
+                        composable(NavigationItem.SignIn.route) {
+                            SignInScreen(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                user, launcher
+                            )
+                        }
+                        composable(NavigationItem.UsersList.route) {
+                            UsersListScreen(userData, db)
+                        }
                     }
                 }
             }

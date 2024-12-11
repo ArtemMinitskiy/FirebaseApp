@@ -1,6 +1,8 @@
 package com.example.firebaseapp
 
 import android.util.Log
+import com.example.firebaseapp.model.Room
+import com.example.firebaseapp.model.User
 import com.google.firebase.firestore.FirebaseFirestore
 
 fun invite(db: FirebaseFirestore, room: Room, room_uid: String, user: User) {

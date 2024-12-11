@@ -1,4 +1,4 @@
-package com.example.firebaseapp
+package com.example.firebaseapp.model
 
 data class User(
     val uid: String = "",

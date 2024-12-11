@@ -1,4 +1,4 @@
-package com.example.firebaseapp
+package com.example.firebaseapp.screens
 
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher
@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.example.firebaseapp.R
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseUser
