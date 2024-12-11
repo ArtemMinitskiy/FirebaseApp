@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import com.example.firebaseapp.ui.theme.FirebaseAppTheme
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +22,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val user = remember { mutableStateOf(Firebase.auth.currentUser) }
-            val db = FirebaseFirestore.getInstance()
+            val db = Firebase.firestore
+//            val db = FirebaseFirestore.getInstance()
             val userData = remember { mutableStateOf(User()) }
 
             LaunchedEffect(user.value) {
@@ -32,7 +34,8 @@ class MainActivity : ComponentActivity() {
                         email = it.email.toString(),
                         picture = it.photoUrl.toString(),
                         name = it.displayName.toString(),
-                        timestamp = System.currentTimeMillis()
+                        timestamp = System.currentTimeMillis(),
+//                        listOfRooms = it.listOfRooms
                     )
                 }
             }
@@ -46,9 +49,22 @@ class MainActivity : ComponentActivity() {
                             email = result.additionalUserInfo?.profile?.get("email").toString(),
                             picture = result.additionalUserInfo?.profile?.get("picture").toString(),
                             name = result.additionalUserInfo?.profile?.get("name").toString(),
-                            timestamp = System.currentTimeMillis()
+                            timestamp = System.currentTimeMillis(),
+                            listOfRooms = arrayListOf()
                         )
-                    )
+                    ).addOnSuccessListener {
+                        Log.e("mLogFire", "Success")
+                    }.addOnFailureListener { e ->
+                        Log.e("mLogFire", "Failure $e")
+                    }
+//                    val room_uid = "${userData.value.uid}_it.uid"
+//                    Log.i("mLogFire", "Room UID: $room_uid")
+//                    val room = Room(
+//                        id = room_uid,
+//                        roomCreatorUid = userData.value.uid,
+//                        listOfUsersId = listOf(userData.value.uid, "ewfwefwef")
+//                    )
+//                    db.collection("rooms").document(room_uid).set(room)
                 },
                 onAuthError = {
                     user.value = null
@@ -64,7 +80,7 @@ class MainActivity : ComponentActivity() {
                             user, launcher
                         )
                     } else {
-                        ChatRoomScreen(user, userData, db)
+                        UsersListScreen(user, userData, db)
                     }
                 }
             }
