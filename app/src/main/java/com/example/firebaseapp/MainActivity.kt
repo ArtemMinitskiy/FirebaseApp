@@ -5,10 +5,20 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExitTransition
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,9 +31,14 @@ import com.cleanease.optimize.navigation.NavigationItem
 import com.example.firebaseapp.firebase.addUser
 import com.example.firebaseapp.firebase.rememberFirebaseAuthLauncher
 import com.example.firebaseapp.model.User
+import com.example.firebaseapp.screens.InviteListScreen
+import com.example.firebaseapp.screens.RoomsListScreen
 import com.example.firebaseapp.screens.SignInScreen
 import com.example.firebaseapp.screens.UsersListScreen
 import com.example.firebaseapp.ui.theme.FirebaseAppTheme
+import com.example.firebaseapp.ui.theme.Orange
+import com.example.firebaseapp.ui.theme.PurpleGrey40
+import com.example.firebaseapp.utils.noRippleClickable
 import com.example.firebaseapp.views.UserToolbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
@@ -47,7 +62,6 @@ class MainActivity : ComponentActivity() {
                         picture = data[0].photoUrl.toString(),
                         name = data[0].displayName.toString(),
                         timestamp = System.currentTimeMillis(),
-//                        listOfRooms = it.listOfRooms
                     )
                 }
             }
@@ -64,11 +78,38 @@ class MainActivity : ComponentActivity() {
             FirebaseAppTheme {
                 Column {
                     if (user.value != null) {
-                        UserToolbar(userData) {
+                        UserToolbar(userData, toInvite = {
+                            navController.navigate(NavigationItem.InvitesList.route)
+                        }) {
                             Firebase.auth.signOut()
                             user.value = null
                         }
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Row(
+                            modifier = Modifier
+//                                .background(Orange)
+                                .wrapContentHeight()
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .padding(vertical = 16.dp)
+                        ) {
+                            Text("Invitations", modifier = Modifier
+                                .border(3.dp, PurpleGrey40, RoundedCornerShape(20.dp))
+                                .padding(horizontal = 8.dp)
+                                .padding(vertical = 4.dp)
+                                .wrapContentSize()
+                                .noRippleClickable {
+                                    navController.navigate(NavigationItem.InvitesList.route)
+                                })
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Room", modifier = Modifier
+                                .border(3.dp, PurpleGrey40, RoundedCornerShape(20.dp))
+                                .padding(horizontal = 8.dp)
+                                .padding(vertical = 4.dp)
+                                .wrapContentSize()
+                                .noRippleClickable {
+                                    navController.navigate(NavigationItem.RoomsList.route)
+                                })
+                        }
                     }
 
                     NavHost(navController = navController,
@@ -89,6 +130,12 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(NavigationItem.UsersList.route) {
                             UsersListScreen(userData, db)
+                        }
+                        composable(NavigationItem.InvitesList.route) {
+                            InviteListScreen(userData, db)
+                        }
+                        composable(NavigationItem.RoomsList.route) {
+                            RoomsListScreen(userData, db)
                         }
                     }
                 }

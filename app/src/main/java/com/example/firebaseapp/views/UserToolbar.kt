@@ -24,7 +24,7 @@ import com.example.firebaseapp.ui.theme.PurpleGrey40
 import com.example.firebaseapp.utils.noRippleClickable
 
 @Composable
-fun UserToolbar(userData: MutableState<User>, signOut: () -> Unit) {
+fun UserToolbar(userData: MutableState<User>, toInvite: () -> Unit, signOut: () -> Unit) {
     Row(
         modifier = Modifier
             .background(Orange)
