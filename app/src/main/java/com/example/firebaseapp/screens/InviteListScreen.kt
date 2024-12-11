@@ -24,7 +24,8 @@ import coil.compose.AsyncImage
 import com.example.firebaseapp.model.Room
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.views.UserView
-import com.example.firebaseapp.invite
+import com.example.firebaseapp.firebase.invite
+import com.example.firebaseapp.utils.Constants.USERS
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -37,7 +38,7 @@ fun InviteListScreen(
     val users = remember { mutableStateListOf<User>() }
 
     LaunchedEffect(Unit) {
-        db.collection("users")
+        db.collection(USERS)
             .orderBy("name")
             .addSnapshotListener { value, _ ->
                 value?.let {

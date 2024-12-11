@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -20,6 +18,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cleanease.optimize.navigation.NavigationItem
+import com.example.firebaseapp.firebase.addUser
+import com.example.firebaseapp.firebase.rememberFirebaseAuthLauncher
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.screens.SignInScreen
 import com.example.firebaseapp.screens.UsersListScreen
@@ -40,12 +40,12 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(user.value) {
                 Log.i("mLogFire", "User: ${user.value?.uid}")
-                user.value?.providerData?.forEach {
+                user.value?.providerData?.let { data ->
                     userData.value = User(
                         uid = user.value?.uid.toString(),
-                        email = it.email.toString(),
-                        picture = it.photoUrl.toString(),
-                        name = it.displayName.toString(),
+                        email = data[0].email.toString(),
+                        picture = data[0].photoUrl.toString(),
+                        name = data[0].displayName.toString(),
                         timestamp = System.currentTimeMillis(),
 //                        listOfRooms = it.listOfRooms
                     )
@@ -55,20 +55,7 @@ class MainActivity : ComponentActivity() {
             val launcher = rememberFirebaseAuthLauncher(
                 onAuthComplete = { result ->
                     user.value = result.user
-                    db.collection("users").document(result.user?.uid.toString()).set(
-                        User(
-                            uid = result.user?.uid.toString(),
-                            email = result.additionalUserInfo?.profile?.get("email").toString(),
-                            picture = result.additionalUserInfo?.profile?.get("picture").toString(),
-                            name = result.additionalUserInfo?.profile?.get("name").toString(),
-                            timestamp = System.currentTimeMillis(),
-                            listOfRooms = arrayListOf()
-                        )
-                    ).addOnSuccessListener {
-                        Log.e("mLogFire", "Add User Success")
-                    }.addOnFailureListener { e ->
-                        Log.e("mLogFire", "Add User Failure $e")
-                    }
+                    addUser(db, result)
                 },
                 onAuthError = {
                     user.value = null
@@ -76,8 +63,13 @@ class MainActivity : ComponentActivity() {
             )
             FirebaseAppTheme {
                 Column {
-                    UserToolbar(userData)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    if (user.value != null) {
+                        UserToolbar(userData) {
+                            Firebase.auth.signOut()
+                            user.value = null
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
 
                     NavHost(navController = navController,
                         startDestination = if (user.value == null) NavigationItem.SignIn.route else NavigationItem.UsersList.route,
@@ -92,7 +84,7 @@ class MainActivity : ComponentActivity() {
                             SignInScreen(
                                 modifier = Modifier
                                     .fillMaxSize(),
-                                user, launcher
+                                launcher
                             )
                         }
                         composable(NavigationItem.UsersList.route) {

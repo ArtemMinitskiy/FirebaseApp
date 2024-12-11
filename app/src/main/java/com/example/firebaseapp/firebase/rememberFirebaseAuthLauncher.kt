@@ -1,4 +1,4 @@
-package com.example.firebaseapp
+package com.example.firebaseapp.firebase
 
 import android.content.Intent
 import androidx.activity.compose.ManagedActivityResultLauncher

@@ -25,6 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.firebaseapp.model.User
+import com.example.firebaseapp.utils.Constants.MESSAGES
+import com.example.firebaseapp.utils.Constants.USERS
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -38,7 +40,7 @@ fun ChatRoomScreen(
     val message = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        db.collection("messages")
+        db.collection(MESSAGES)
             .orderBy("timestamp")
             .addSnapshotListener { value, _ ->
                 value?.let {
@@ -51,7 +53,7 @@ fun ChatRoomScreen(
     }
 
     LaunchedEffect(Unit) {
-        db.collection("users")
+        db.collection(USERS)
             .orderBy("name")
             .addSnapshotListener { value, _ ->
                 value?.let {
@@ -98,7 +100,7 @@ fun ChatRoomScreen(
                 modifier = Modifier.weight(1f)
             )
             Button(onClick = {
-                db.collection("messages").add(
+                db.collection(MESSAGES).add(
                     mapOf(
                         "text" to message.value,
                         "user" to user.value?.displayName,

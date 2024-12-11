@@ -12,7 +12,8 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.example.firebaseapp.invite
+import com.example.firebaseapp.firebase.getUsersList
+import com.example.firebaseapp.firebase.invite
 import com.example.firebaseapp.model.Room
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.views.UserView
@@ -26,25 +27,9 @@ fun UsersListScreen(
     val users = remember { mutableStateListOf<User>() }
 
     LaunchedEffect(Unit) {
-        db.collection("users")
-            .orderBy("name")
-            .addSnapshotListener { value, _ ->
-                value?.let {
-                    for (doc in it.documents) {
-                        if (doc.getString("uid") != userData.value.uid) {
-                            users.add(
-                                User(
-                                    uid = doc.getString("uid").toString(),
-                                    email = doc.getString("email").toString(),
-                                    picture = doc.getString("picture").toString(),
-                                    name = doc.getString("name").toString(),
-                                    listOfRooms = arrayListOf()
-                                )
-                            )
-                        }
-                    }
-                }
-            }
+        getUsersList(db, userData.value.uid) { user ->
+            users.add(user)
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {

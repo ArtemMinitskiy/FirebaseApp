@@ -1,4 +1,4 @@
-package com.example.firebaseapp
+package com.example.firebaseapp.utils
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable

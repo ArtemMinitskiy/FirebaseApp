@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.firebaseapp.model.User
-import com.example.firebaseapp.noRippleClickable
+import com.example.firebaseapp.utils.noRippleClickable
 import com.example.firebaseapp.ui.theme.Blue
 
 @Composable
