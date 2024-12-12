@@ -17,4 +17,9 @@ object Constants {
     const val TO = "to"
     const val ROOM_ID = "roomId"
     const val STATUS = "status"
+
+    //Messages
+    const val TIMESTAMP = "timestamp"
+    const val CONTENT = "content"
+
 }

@@ -35,6 +35,7 @@ import com.example.firebaseapp.screens.SignInScreen
 import com.example.firebaseapp.screens.UsersListScreen
 import com.example.firebaseapp.ui.theme.FirebaseAppTheme
 import com.example.firebaseapp.ui.theme.PurpleGrey40
+import com.example.firebaseapp.utils.Constants.ROOM_ID
 import com.example.firebaseapp.utils.noRippleClickable
 import com.example.firebaseapp.views.UserToolbar
 import com.google.firebase.auth.ktx.auth
@@ -132,12 +133,13 @@ class MainActivity : ComponentActivity() {
                             InviteListScreen(userData, db)
                         }
                         composable(NavigationItem.RoomsList.route) {
-                            RoomsListScreen(userData, db) {
-                                navController.navigate(NavigationItem.Rooms.route)
+                            RoomsListScreen(userData, db) { roomId ->
+                                navController.navigate("${NavigationItem.Rooms.route}/$roomId")
                             }
                         }
-                        composable(NavigationItem.Rooms.route) {
-                            ChatRoomScreen(userData, db)
+                        composable("${NavigationItem.Rooms.route}/{$ROOM_ID}") { backStackEntry ->
+                            val roomId = backStackEntry.arguments?.getString(ROOM_ID)
+                            ChatRoomScreen(userData, db, roomId)
                         }
                     }
                 }

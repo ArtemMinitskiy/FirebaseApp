@@ -1,6 +1,5 @@
 package com.example.firebaseapp.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,48 +21,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.firebaseapp.model.Message
 import com.example.firebaseapp.model.User
+import com.example.firebaseapp.utils.Constants.CONTENT
 import com.example.firebaseapp.utils.Constants.MESSAGES
 import com.example.firebaseapp.utils.Constants.ROOMS
-import com.example.firebaseapp.utils.Constants.USERS
-import com.google.firebase.auth.FirebaseUser
+import com.example.firebaseapp.utils.Constants.TIMESTAMP
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun ChatRoomScreen(
     userData: MutableState<User>,
     db: FirebaseFirestore,
+    roomId: String?,
 ) {
     val messages = remember { mutableStateListOf<String>() }
     val text = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        db.collection(MESSAGES)
-            .orderBy("timestamp")
-            .addSnapshotListener { value, _ ->
-                value?.let {
-                    messages.clear()
-                    for (doc in it.documents) {
-                        messages.add(doc.getString("text") ?: "")
-                    }
-                }
-            }
-    }
-
-    LaunchedEffect(Unit) {
-        db.collection(USERS)
-            .orderBy("name")
-            .addSnapshotListener { value, _ ->
-                value?.let {
-                    for (doc in it.documents) {
-                        if (doc.getString("uid") != userData.value.uid) {
-                            Log.i(
-                                "mLogFire",
-                                "User: ${doc.getString("name")} ${doc.getString("email")}"
-                            )
+        roomId?.let {
+            db.collection(ROOMS).document(it).collection(MESSAGES)
+                .orderBy(TIMESTAMP)
+                .addSnapshotListener { value, _ ->
+                    value?.let {
+                        messages.clear()
+                        for (doc in it.documents) {
+                            messages.add(doc.getString(CONTENT) ?: "")
                         }
                     }
                 }
-            }
+        }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -80,8 +65,14 @@ fun ChatRoomScreen(
                 modifier = Modifier.weight(1f)
             )
             Button(onClick = {
-//                val message = Message(senderId = userData.value.uid, content = text.value, timestamp = System.currentTimeMillis())
-//                db.collection(ROOMS).document(roomId).collection(MESSAGES).add(message)
+//                Log.i("mLogFire", "roomId: $roomId")
+//                Log.i("mLogFire", "text: ${text.value}")
+                val message = Message(
+                    senderId = userData.value.uid,
+                    content = text.value,
+                    timestamp = System.currentTimeMillis()
+                )
+                roomId?.let { db.collection(ROOMS).document(it).collection(MESSAGES).add(message) }
 
                 text.value = ""
             }) {

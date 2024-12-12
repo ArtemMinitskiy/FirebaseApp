@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.example.firebaseapp.firebase.getUser
@@ -22,15 +23,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun RoomsListScreen(
     userData: MutableState<User>,
     db: FirebaseFirestore,
-    onChat: () -> Unit
+    onChat: (String) -> Unit
 ) {
     val rooms = remember { mutableStateListOf<User>() }
+    val roomId = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         db.collection(ROOMS)
             .addSnapshotListener { value, _ ->
                 value?.let {
                     for (doc in it.documents) {
+                        roomId.value = doc.id
                         Log.i("mLogFire", "ROOM: ${doc.id}")
                         Log.i("mLogFire", "ROOM: ${doc.data?.values}")
 
@@ -59,7 +62,7 @@ fun RoomsListScreen(
         LazyColumn(modifier = Modifier.wrapContentHeight()) {
             items(rooms) {
                 ChatView(it) {
-                    onChat()
+                    onChat(roomId.value)
                 }
             }
         }
