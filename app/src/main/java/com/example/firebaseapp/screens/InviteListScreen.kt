@@ -13,19 +13,22 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import com.example.firebaseapp.firebase.getInvitationsList
+import com.example.firebaseapp.firebase.asFlow
 import com.example.firebaseapp.firebase.getUser
-import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.model.Room
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.ACCEPTED
+import com.example.firebaseapp.utils.Constants.FROM
 import com.example.firebaseapp.utils.Constants.INVITATIONS
 import com.example.firebaseapp.utils.Constants.INVITE_ID
+import com.example.firebaseapp.utils.Constants.PENDING
 import com.example.firebaseapp.utils.Constants.ROOMS
 import com.example.firebaseapp.utils.Constants.ROOM_ID
 import com.example.firebaseapp.utils.Constants.STATUS
+import com.example.firebaseapp.utils.Constants.TO
 import com.example.firebaseapp.views.UserInvitationView
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun InviteListScreen(
@@ -33,17 +36,23 @@ fun InviteListScreen(
     db: FirebaseFirestore
 ) {
     val users = remember { mutableStateListOf<User>() }
-    val invite = remember { mutableStateOf(Invite()) }
+    val inviteId = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        getInvitationsList(db, userData.value.uid, addNewInvitation = { newInvite ->
+        val invitationsRef = db.collection(INVITATIONS)
+        val query = invitationsRef
+            .whereEqualTo(TO, userData.value.uid)
+            .whereEqualTo(STATUS, PENDING)
+
+        query.asFlow().collectLatest { snapshot ->
             users.clear()
-            invite.value = newInvite
-            getUser(db, newInvite.from) { user ->
-                users.add(user)
+            for (doc in snapshot.documents) {
+//                Log.i("mLogFire", "INVITATIONS: ${doc.getString(INVITE_ID).toString()}")
+                inviteId.value = doc.getString(INVITE_ID).toString()
+                getUser(db, doc.getString(FROM).toString()) { user ->
+                    users.add(user)
+                }
             }
-        }) {
-            users.clear()
         }
     }
 
@@ -64,22 +73,20 @@ fun InviteListScreen(
                         )
                         roomRef.set(room).addOnSuccessListener {
                             val inviteRef =
-                                db.collection(INVITATIONS).document(invite.value.inviteId)
+                                db.collection(INVITATIONS).document(inviteId.value)
                             inviteRef.update(
                                 STATUS,
                                 ACCEPTED,
                                 ROOM_ID,
                                 roomRef.id,
                                 INVITE_ID,
-                                invite.value.inviteId
+                                inviteId.value
                             )
                         }
                     }, reject = {
                         Log.i("mLogFire", "Reject Invite From User: ${it.name}")
-                        db.collection(INVITATIONS).document(invite.value.inviteId).delete()
-                        if (users.size == 1) {
-                            users.clear()
-                        }
+                        Log.e("mLogFire", "inviteId: ${inviteId.value}")
+                        db.collection(INVITATIONS).document(inviteId.value).delete()
                     }
                 )
             }
