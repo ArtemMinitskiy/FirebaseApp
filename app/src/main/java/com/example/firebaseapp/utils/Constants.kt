@@ -12,6 +12,7 @@ object Constants {
     const val ACCEPTED = "accepted"
 
     //Invites
+    const val INVITE_ID = "inviteId"
     const val FROM = "from"
     const val TO = "to"
     const val ROOM_ID = "roomId"

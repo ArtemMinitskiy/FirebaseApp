@@ -4,6 +4,8 @@ import android.util.Log
 import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.utils.Constants.FROM
 import com.example.firebaseapp.utils.Constants.INVITATIONS
+import com.example.firebaseapp.utils.Constants.INVITE_ID
+import com.example.firebaseapp.utils.Constants.PENDING
 import com.example.firebaseapp.utils.Constants.ROOM_ID
 import com.example.firebaseapp.utils.Constants.STATUS
 import com.example.firebaseapp.utils.Constants.TO
@@ -16,25 +18,24 @@ fun getInvitationsList(
     clear: () -> Unit,
 ) {
     db.collection(INVITATIONS)
-        .addSnapshotListener { value, _ ->
-            if (value?.isEmpty == true) {
+        .whereEqualTo(TO, currentUserUID)
+        .whereEqualTo(STATUS, PENDING)
+        .get()
+        .addOnSuccessListener { snapshot ->
+            if (snapshot?.isEmpty == true) {
                 clear()
             } else {
-                value?.let {
-                    for (doc in it.documents) {
-                        Log.i("mLogFire", "INVITATIONS: $doc")
-                        if (doc.getString(FROM) != currentUserUID) {
-                            addNewInvitation(
-                                Invite(
-                                    inviteId = doc.id,
-                                    from = doc.getString(FROM).toString(),
-                                    to = doc.getString(TO).toString(),
-                                    roomId = doc.getString(ROOM_ID).toString(),
-                                    status = doc.getString(STATUS).toString()
-                                )
-                            )
-                        }
-                    }
+                for (doc in snapshot.documents) {
+                    Log.i("mLogFire", "INVITATIONS: $doc")
+                    addNewInvitation(
+                        Invite(
+                            inviteId = doc.getString(INVITE_ID).toString(),
+                            from = doc.getString(FROM).toString(),
+                            to = doc.getString(TO).toString(),
+                            roomId = doc.getString(ROOM_ID).toString(),
+                            status = doc.getString(STATUS).toString()
+                        )
+                    )
                 }
             }
         }

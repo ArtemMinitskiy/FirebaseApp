@@ -16,7 +16,6 @@ import com.example.firebaseapp.firebase.getUser
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.ROOMS
 import com.example.firebaseapp.views.ChatView
-import com.example.firebaseapp.views.UserView
 import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
@@ -38,17 +37,17 @@ fun RoomsListScreen(
                         rooms.clear()
                         if (doc.data?.get("createdBy") != userData.value.uid) {
                             getUser(db, doc.data?.get("createdBy").toString()) { user ->
-                                Log.e("mLogFire", "USER ROOM: $user")
                                 rooms.add(user)
                             }
                         } else {
-                            getUser(
-                                db,
-                                doc.data?.get("participants").toString().split(" ").get(1)
-                                    .substringBefore("]")
-                            ) { user ->
-                                Log.e("mLogFire", "USER ROOM: $user")
-                                rooms.add(user)
+                            val participants = doc.get("participants") as? List<String>
+                            participants?.get(1)?.let { it1 ->
+                                getUser(
+                                    db,
+                                    it1
+                                ) { user ->
+                                    rooms.add(user)
+                                }
                             }
                         }
                     }

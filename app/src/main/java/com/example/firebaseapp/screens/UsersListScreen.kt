@@ -13,9 +13,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.example.firebaseapp.firebase.getUsersList
-import com.example.firebaseapp.firebase.invite
 import com.example.firebaseapp.model.Invite
-import com.example.firebaseapp.model.Room
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.INVITATIONS
 import com.example.firebaseapp.utils.Constants.PENDING
@@ -32,7 +30,6 @@ fun UsersListScreen(
     LaunchedEffect(Unit) {
         getUsersList(db, userData.value.uid) { user ->
             users.clear()
-//            Log.e("mLogFire", "New User: $user")
             users.add(user)
         }
     }
@@ -43,9 +40,22 @@ fun UsersListScreen(
                 UserView(it) {
                     Log.i("mLogFire", "Invite User: ${it.name}")
                     val roomId = "${userData.value.uid}_${it.uid}"
-                    Log.i("mLogFire", "Room UID: $roomId")
-                    val invite = Invite(from = userData.value.uid, to = it.uid, roomId = roomId, status = PENDING)
-                    db.collection(INVITATIONS).add(invite)
+                    val inviteRef = db.collection(INVITATIONS).document()
+                    val inviteId = inviteRef.id
+                    val invite = Invite(
+                        inviteId = inviteId,
+                        from = userData.value.uid,
+                        to = it.uid,
+                        roomId = roomId,
+                        status = PENDING
+                    )
+                    inviteRef.set(invite)
+                        .addOnSuccessListener {
+                            Log.i("mLogFire", "Send Invite to User")
+                        }
+                        .addOnFailureListener {
+                            Log.e("mLogFire", "Failure Invite to User")
+                        }
                 }
             }
         }
