@@ -21,6 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -41,7 +42,9 @@ import com.example.firebaseapp.views.UserToolbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,10 +53,12 @@ class MainActivity : ComponentActivity() {
             val user = remember { mutableStateOf(Firebase.auth.currentUser) }
             val db = Firebase.firestore
             val userData = remember { mutableStateOf(User()) }
+            val mainViewModel: MainViewModel = viewModel()
 
             LaunchedEffect(user.value) {
-//                Log.i("mLogFire", "User: ${user.value?.uid}")
+                mainViewModel.setUserAuth(user.value)
                 user.value?.providerData?.let { data ->
+                    user.value?.uid?.let { mainViewModel.setCurrentUserUID(it) }
                     userData.value = User(
                         uid = user.value?.uid.toString(),
                         email = data[0].email.toString(),
@@ -68,6 +73,7 @@ class MainActivity : ComponentActivity() {
                 onAuthComplete = { result ->
                     user.value = result.user
                     addUser(db, result)
+                    result.user?.uid?.let { mainViewModel.setCurrentUserUID(it) }
                 },
                 onAuthError = {
                     user.value = null
@@ -127,7 +133,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable(NavigationItem.UsersList.route) {
-                            UsersListScreen(userData, db)
+                            UsersListScreen(userData, mainViewModel)
                         }
                         composable(NavigationItem.InvitesList.route) {
                             InviteListScreen(userData, db)
