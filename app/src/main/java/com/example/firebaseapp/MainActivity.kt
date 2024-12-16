@@ -102,6 +102,7 @@ class MainActivity : ComponentActivity() {
                                 .padding(vertical = 4.dp)
                                 .wrapContentSize()
                                 .noRippleClickable {
+                                    mainViewModel.getInvitesList(userData.value.uid)
                                     navController.navigate(NavigationItem.InvitesList.route)
                                 })
                             Spacer(modifier = Modifier.width(8.dp))
@@ -136,7 +137,7 @@ class MainActivity : ComponentActivity() {
                             UsersListScreen(userData, mainViewModel)
                         }
                         composable(NavigationItem.InvitesList.route) {
-                            InviteListScreen(userData, db)
+                            InviteListScreen(mainViewModel)
                         }
                         composable(NavigationItem.RoomsList.route) {
                             RoomsListScreen(userData, db) { roomId ->

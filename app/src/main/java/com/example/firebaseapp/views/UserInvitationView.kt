@@ -16,15 +16,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.firebaseapp.model.User
-import com.example.firebaseapp.utils.noRippleClickable
+import com.example.firebaseapp.R
+import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.ui.theme.Blue
 import com.example.firebaseapp.ui.theme.Red
+import com.example.firebaseapp.utils.noRippleClickable
 
 @Composable
-fun UserInvitationView(user: User, accept: () -> Unit, reject: () -> Unit) {
+fun UserInvitationView(invite: Invite, accept: () -> Unit, reject: () -> Unit) {
     Row(
         modifier = Modifier
             .wrapContentHeight()
@@ -32,7 +34,7 @@ fun UserInvitationView(user: User, accept: () -> Unit, reject: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = user.picture,
+            model = invite.fromPicture,
             contentDescription = "Image from File",
             modifier = Modifier
                 .size(60.dp),
@@ -44,32 +46,33 @@ fun UserInvitationView(user: User, accept: () -> Unit, reject: () -> Unit) {
                 .wrapContentHeight(),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(user.name)
-            Text(user.email)
+            Text(invite.fromName)
+            Text(invite.fromEmail)
             Row(
                 modifier = Modifier
                     .wrapContentHeight(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Accept", modifier = Modifier
-                    .border(3.dp, Blue, RoundedCornerShape(20.dp))
-                    .padding(horizontal = 8.dp)
-                    .padding(vertical = 4.dp)
-                    .wrapContentSize()
-                    .noRippleClickable {
-                        accept()
-                    })
+                Text(
+                    stringResource(R.string.accept), modifier = Modifier
+                        .border(3.dp, Blue, RoundedCornerShape(20.dp))
+                        .padding(horizontal = 8.dp)
+                        .padding(vertical = 4.dp)
+                        .wrapContentSize()
+                        .noRippleClickable {
+                            accept()
+                        })
                 Spacer(modifier = Modifier.width(16.dp))
-                Text("Reject", modifier = Modifier
-                    .border(3.dp, Red, RoundedCornerShape(20.dp))
-                    .padding(horizontal = 8.dp)
-                    .padding(vertical = 4.dp)
-                    .wrapContentSize()
-                    .noRippleClickable {
-                        reject()
-                    })
+                Text(
+                    stringResource(R.string.reject), modifier = Modifier
+                        .border(3.dp, Red, RoundedCornerShape(20.dp))
+                        .padding(horizontal = 8.dp)
+                        .padding(vertical = 4.dp)
+                        .wrapContentSize()
+                        .noRippleClickable {
+                            reject()
+                        })
             }
-
         }
     }
 }

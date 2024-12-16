@@ -1,4 +1,4 @@
-package com.example.firebaseapp
+package com.example.firebaseapp.mappers
 
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.UID

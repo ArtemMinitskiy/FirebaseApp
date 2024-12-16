@@ -5,6 +5,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.firebaseapp.firebase.FirestoreRepository
+import com.example.firebaseapp.mappers.InviteMapper
+import com.example.firebaseapp.mappers.UserMapper
+import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.model.User
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,7 +53,36 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun invite(fromUid: String, toUid: String, toName: String) {
-        firestoreRepository.invite(fromUid, toUid, toName)
+    fun invite(
+        fromUid: String,
+        fromEmail: String,
+        fromName: String,
+        fromPicture: String,
+        toUid: String,
+        toName: String
+    ) {
+        firestoreRepository.invite(fromUid, fromEmail, fromName, fromPicture, toUid, toName)
     }
+
+    private val _invites = MutableStateFlow<List<Invite>>(listOf())
+    var invites: StateFlow<List<Invite>> = _invites
+
+    fun getInvitesList(currentUserUid: String) {
+        firestoreRepository.getInvitesList(currentUserUid, success = { snapshot ->
+            snapshot.let {
+                _invites.value = InviteMapper().mapInvite(it.documents)
+            }
+        }, ex = {
+
+        })
+    }
+
+    fun createRoom(invite: Invite) {
+        firestoreRepository.createRoom(invite)
+    }
+
+    fun deleteInvite(invite: Invite) {
+        firestoreRepository.deleteInvite(invite)
+    }
+
 }

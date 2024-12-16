@@ -27,6 +27,9 @@ fun UsersListScreen(
                 UserView(it) {
                     mainViewModel.invite(
                         fromUid = userData.value.uid,
+                        fromEmail = userData.value.email,
+                        fromName = userData.value.name,
+                        fromPicture = userData.value.picture,
                         toUid = it.uid,
                         toName = it.name
                     )
