@@ -178,8 +178,9 @@ class FirestoreRepository @Inject constructor() {
         val roomRef = db.collection(ROOMS).document()
         val roomId = roomRef.id
         val room = RoomTest(
-            id = roomId,
+            roomId = roomId,
             roomName = "Private Room",
+            createdBy = invite.userFrom.uid,
             userFrom = invite.userFrom,
             userTo = invite.userTo
         )

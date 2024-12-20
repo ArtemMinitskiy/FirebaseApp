@@ -1,5 +1,8 @@
 package com.example.firebaseapp.mappers
 
+import android.util.Log
+import com.example.firebaseapp.model.InviteTest
+import com.example.firebaseapp.model.RoomTest
 import com.example.firebaseapp.utils.Constants.CREATED_BY
 import com.google.firebase.firestore.DocumentSnapshot
 
@@ -17,6 +20,22 @@ class RoomMapper {
                     roomsIdList.add(id)
                 }
             }
+        }
+
+        return roomsIdList
+    }
+
+    fun mapRoom2(documents: MutableList<DocumentSnapshot>): List<RoomTest?> {
+        val roomsIdList = arrayListOf<RoomTest?>()
+        for (doc in documents) {
+            documents.mapNotNull { document ->
+                roomsIdList.add(
+                    document.toObject(RoomTest::class.java)?.copy(
+                        roomId = document.id
+                    )
+                )
+            }
+            Log.i("mLogRoom", "Room: $roomsIdList")
         }
 
         return roomsIdList

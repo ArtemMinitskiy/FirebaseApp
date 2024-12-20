@@ -25,49 +25,17 @@ import com.google.firebase.firestore.FirebaseFirestore
 @Composable
 fun RoomsListScreen(
     userData: MutableState<User>,
-    db: FirebaseFirestore,
     mainViewModel: MainViewModel,
     onChat: (String) -> Unit
 ) {
-    val usersRooms by mainViewModel.usersRooms.collectAsState()
-    val rooms = remember { mutableStateListOf<User>() }
-    val roomId = remember { mutableStateOf("") }
+    val usersRooms by mainViewModel.usersRooms2.collectAsState()
 
-    LaunchedEffect(Unit) {
-        db.collection(ROOMS)
-            .addSnapshotListener { value, _ ->
-                value?.let {
-                    for (doc in it.documents) {
-                        roomId.value = doc.id
-                        Log.i("mLogFire", "ROOM: ${doc.id}")
-                        Log.i("mLogFire", "ROOM: ${doc.data?.values}")
-
-                        rooms.clear()
-                        if (doc.data?.get("createdBy") != userData.value.uid) {
-                            getUser(db, doc.data?.get("createdBy").toString()) { user ->
-                                rooms.add(user)
-                            }
-                        } else {
-                            val participants = doc.get("participants") as? List<String>
-                            participants?.get(1)?.let { it1 ->
-                                getUser(
-                                    db,
-                                    it1
-                                ) { user ->
-                                    rooms.add(user)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-    }
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.wrapContentHeight()) {
             items(usersRooms) {
-                ChatView(it) {
-                    Log.i("mLogMessage", "${it.uid}")
-                    onChat(it.uid)
+                ChatView(userData.value.uid, it) {
+                    Log.i("mLogMessage", "${it?.roomId}")
+//                    onChat(it.uid)
 //                    onChat(roomId.value)
                 }
             }

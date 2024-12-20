@@ -10,7 +10,9 @@ import com.example.firebaseapp.mappers.RoomMapper
 import com.example.firebaseapp.mappers.UserMapper
 import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.model.InviteTest
+import com.example.firebaseapp.model.RoomTest
 import com.example.firebaseapp.model.User
+import com.example.firebaseapp.utils.Constants.CREATED_BY
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -99,9 +101,9 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             firestoreRepository.fetchInvitations(success = { querySnapshot ->
                 querySnapshot.documents.mapNotNull { document ->
-                    document.toObject(InviteTest::class.java)?.copy(
-                        inviteId = document.id // Ensure inviteId is set to the document ID
-                    )
+//                    document.toObject(InviteTest::class.java)?.copy(
+//                        inviteId = document.id // Ensure inviteId is set to the document ID
+//                    )
                     _invites.value = InviteMapper().mapInvite2(querySnapshot.documents)
                 }
             }, ex = {
@@ -135,6 +137,18 @@ class MainViewModel @Inject constructor(
                         }
                     }
                 }
+            }
+        }, ex = {
+
+        })
+    }
+
+    private val _usersRooms2 = MutableStateFlow<List<RoomTest?>>(arrayListOf())
+    var usersRooms2: StateFlow<List<RoomTest?>> = _usersRooms2
+    fun getRoomsList2() {
+        firestoreRepository.getRoomsList(success = { querySnapshot ->
+            querySnapshot.documents.mapNotNull { document ->
+                _usersRooms2.value = RoomMapper().mapRoom2(querySnapshot.documents)
             }
         }, ex = {
 

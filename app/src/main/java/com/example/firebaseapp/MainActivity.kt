@@ -114,7 +114,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(vertical = 4.dp)
                                     .wrapContentSize()
                                     .noRippleClickable {
-                                        mainViewModel.getRoomsList(userData.value.uid)
+                                        mainViewModel.getRoomsList2()
                                         navController.navigate(NavigationItem.RoomsList.route)
                                     })
                         }
@@ -143,7 +143,7 @@ class MainActivity : ComponentActivity() {
                             InviteListScreen(mainViewModel)
                         }
                         composable(NavigationItem.RoomsList.route) {
-                            RoomsListScreen(userData, db, mainViewModel) { roomId ->
+                            RoomsListScreen(userData, mainViewModel) { roomId ->
                                 navController.navigate("${NavigationItem.Rooms.route}/$roomId")
                             }
                         }
