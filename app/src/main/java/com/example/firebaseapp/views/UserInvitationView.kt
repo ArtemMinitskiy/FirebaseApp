@@ -20,13 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.firebaseapp.R
-import com.example.firebaseapp.model.Invite
+import com.example.firebaseapp.model.InviteTest
 import com.example.firebaseapp.ui.theme.Blue
 import com.example.firebaseapp.ui.theme.Red
 import com.example.firebaseapp.utils.noRippleClickable
 
 @Composable
-fun UserInvitationView(invite: Invite, accept: () -> Unit, reject: () -> Unit) {
+fun UserInvitationView(invite: InviteTest?, accept: () -> Unit, reject: () -> Unit) {
     Row(
         modifier = Modifier
             .wrapContentHeight()
@@ -34,7 +34,7 @@ fun UserInvitationView(invite: Invite, accept: () -> Unit, reject: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
-            model = invite.fromPicture,
+            model = invite?.userFrom?.picture,
             contentDescription = "Image from File",
             modifier = Modifier
                 .size(60.dp),
@@ -46,8 +46,8 @@ fun UserInvitationView(invite: Invite, accept: () -> Unit, reject: () -> Unit) {
                 .wrapContentHeight(),
             verticalArrangement = Arrangement.Center
         ) {
-            Text(invite.fromName)
-            Text(invite.fromEmail)
+            invite?.userFrom?.name?.let { Text(it) }
+            invite?.userFrom?.email?.let { Text(it) }
             Row(
                 modifier = Modifier
                     .wrapContentHeight(),

@@ -2,6 +2,7 @@ package com.example.firebaseapp.mappers
 
 import android.util.Log
 import com.example.firebaseapp.model.Invite
+import com.example.firebaseapp.model.InviteTest
 import com.example.firebaseapp.utils.Constants.FROM
 import com.example.firebaseapp.utils.Constants.FROM_EMAIL
 import com.example.firebaseapp.utils.Constants.FROM_NAME
@@ -28,6 +29,26 @@ class InviteMapper {
                     status = doc.getString(STATUS).toString()
                 )
             )
+        }
+
+//        Log.i("mLogInvite", "Invites: $invitesList")
+        return invitesList
+    }
+
+    fun mapInvite2(documents: MutableList<DocumentSnapshot>): List<InviteTest?> {
+        val invitesList = arrayListOf<InviteTest?>()
+        for (doc in documents) {
+            documents.mapNotNull { document ->
+//                document.toObject(InviteTest::class.java)?.copy(
+//                    inviteId = document.id // Ensure inviteId is set to the document ID
+//                )
+                invitesList.add(
+                    document.toObject(InviteTest::class.java)?.copy(
+                        inviteId = document.id // Ensure inviteId is set to the document ID
+                    )
+                )
+            }
+
         }
 
         Log.i("mLogInvite", "Invites: $invitesList")

@@ -24,6 +24,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirestoreRepository @Inject constructor() {
@@ -126,7 +127,6 @@ class FirestoreRepository @Inject constructor() {
             inviteId = inviteId,
             userFrom = userFrom,
             userTo = userTo,
-            to = userTo.uid,
             roomId = roomId,
             status = PENDING
         )
@@ -154,6 +154,24 @@ class FirestoreRepository @Inject constructor() {
                 }
             }
     }
+
+
+    fun fetchInvitations(
+        success: (QuerySnapshot) -> Unit,
+        ex: (FirebaseFirestoreException) -> Unit
+    ) {
+        val querySnapshot =
+            db.collection(INVITATIONS).whereEqualTo(STATUS, PENDING)
+
+        querySnapshot.addSnapshotListener { value, e ->
+            if (e != null) {
+                ex(e)
+            } else {
+                value?.let { success(it) }
+            }
+        }
+    }
+
 
     fun createRoom(invite: Invite) {
         val roomRef = db.collection(ROOMS).document()

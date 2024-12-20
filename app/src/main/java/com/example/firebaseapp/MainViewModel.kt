@@ -9,6 +9,7 @@ import com.example.firebaseapp.mappers.InviteMapper
 import com.example.firebaseapp.mappers.RoomMapper
 import com.example.firebaseapp.mappers.UserMapper
 import com.example.firebaseapp.model.Invite
+import com.example.firebaseapp.model.InviteTest
 import com.example.firebaseapp.model.User
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
@@ -84,17 +85,29 @@ class MainViewModel @Inject constructor(
         firestoreRepository.invite2(userFrom, userTo)
     }
 
-    private val _invites = MutableStateFlow<List<Invite>>(listOf())
-    var invites: StateFlow<List<Invite>> = _invites
+    private val _invites = MutableStateFlow<List<InviteTest?>>(listOf())
+    var invites: StateFlow<List<InviteTest?>> = _invites
 
     fun getInvitesList(currentUserUid: String) {
-        firestoreRepository.getInvitesList(currentUserUid, success = { snapshot ->
-            snapshot.let {
-                _invites.value = InviteMapper().mapInvite(it.documents)
-            }
-        }, ex = {
+//        firestoreRepository.getInvitesList(currentUserUid, success = { snapshot ->
+//            snapshot.let {
+//                _invites.value = InviteMapper().mapInvite(it.documents)
+//            }
+//        }, ex = {
+//
+//        })
+        viewModelScope.launch(Dispatchers.IO) {
+            firestoreRepository.fetchInvitations(success = { querySnapshot ->
+                querySnapshot.documents.mapNotNull { document ->
+                    document.toObject(InviteTest::class.java)?.copy(
+                        inviteId = document.id // Ensure inviteId is set to the document ID
+                    )
+                    _invites.value = InviteMapper().mapInvite2(querySnapshot.documents)
+                }
+            }, ex = {
 
-        })
+            })
+        }
     }
 
     fun createRoom(invite: Invite) {
