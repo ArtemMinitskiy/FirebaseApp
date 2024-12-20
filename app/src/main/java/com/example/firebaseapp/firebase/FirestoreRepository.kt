@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.model.InviteTest
 import com.example.firebaseapp.model.Room
+import com.example.firebaseapp.model.RoomTest
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.ACCEPTED
 import com.example.firebaseapp.utils.Constants.CREATED_BY
@@ -173,17 +174,14 @@ class FirestoreRepository @Inject constructor() {
     }
 
 
-    fun createRoom(invite: Invite) {
+    fun createRoom(invite: InviteTest) {
         val roomRef = db.collection(ROOMS).document()
         val roomId = roomRef.id
-        val room = Room(
+        val room = RoomTest(
             id = roomId,
             roomName = "Private Room",
-            createdBy = invite.from,
-            createdByEmail = invite.fromEmail,
-            createdByName = invite.fromName,
-            createdByPicture = invite.fromPicture,
-            participants = listOf(invite.from, invite.to)
+            userFrom = invite.userFrom,
+            userTo = invite.userTo
         )
         roomRef.set(room)
             .addOnSuccessListener {
@@ -204,7 +202,7 @@ class FirestoreRepository @Inject constructor() {
             }
     }
 
-    fun deleteInvite(invite: Invite) {
+    fun deleteInvite(invite: InviteTest) {
         db.collection(INVITATIONS).document(invite.inviteId).delete()
     }
 

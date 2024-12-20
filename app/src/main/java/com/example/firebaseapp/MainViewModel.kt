@@ -110,11 +110,11 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun createRoom(invite: Invite) {
+    fun createRoom(invite: InviteTest) {
         firestoreRepository.createRoom(invite)
     }
 
-    fun deleteInvite(invite: Invite) {
+    fun deleteInvite(invite: InviteTest) {
         firestoreRepository.deleteInvite(invite)
     }
 

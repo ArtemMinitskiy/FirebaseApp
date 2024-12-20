@@ -21,16 +21,16 @@ fun InviteListScreen(
 
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.wrapContentHeight()) {
-            items(usersInvites) {
+            items(usersInvites) { invite ->
                 UserInvitationView(
-                    it,
+                    invite,
                     accept = {
-                        Log.i("mLogFire", "Accept Invite From User: ${it}")
-//                        mainViewModel.createRoom(it)
+                        Log.i("mLogFire", "Accept Invite From User: $invite")
+                        invite?.let { mainViewModel.createRoom(it) }
 
                     }, reject = {
-                        Log.i("mLogFire", "Reject Invite From User: ${it}")
-//                        mainViewModel.deleteInvite(it)
+                        Log.i("mLogFire", "Reject Invite From User: $invite")
+                        invite?.let { mainViewModel.deleteInvite(it) }
                     }
                 )
             }
