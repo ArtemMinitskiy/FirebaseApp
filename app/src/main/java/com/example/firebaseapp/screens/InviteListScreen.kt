@@ -26,7 +26,14 @@ fun InviteListScreen(
                     it,
                     accept = {
                         Log.i("mLogFire", "Accept Invite From User: ${it}")
-                        mainViewModel.createRoom(it)
+//                        mainViewModel.createRoom(it)
+
+                        mainViewModel.getUser(it.from, getUser = {
+                            Log.i("mLogFire", "FROM: $it")
+                        })
+                        mainViewModel.getUser(it.to, getUser = {
+                            Log.i("mLogFire", "TO: $it")
+                        })
                     }, reject = {
                         Log.i("mLogFire", "Reject Invite From User: ${it}")
                         mainViewModel.deleteInvite(it)

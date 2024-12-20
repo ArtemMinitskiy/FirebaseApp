@@ -20,13 +20,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.cleanease.optimize.navigation.NavigationItem
-import com.example.firebaseapp.firebase.addUser
 import com.example.firebaseapp.firebase.rememberFirebaseAuthLauncher
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.screens.ChatRoomScreen
@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
             val launcher = rememberFirebaseAuthLauncher(
                 onAuthComplete = { result ->
                     user.value = result.user
-                    addUser(db, result)
+                    mainViewModel.addUser(result)
                     result.user?.uid?.let { mainViewModel.setCurrentUserUID(it) }
                 },
                 onAuthError = {
@@ -96,24 +96,27 @@ class MainActivity : ComponentActivity() {
                                 .padding(horizontal = 16.dp)
                                 .padding(vertical = 16.dp)
                         ) {
-                            Text("Invitations", modifier = Modifier
-                                .border(3.dp, PurpleGrey40, RoundedCornerShape(20.dp))
-                                .padding(horizontal = 8.dp)
-                                .padding(vertical = 4.dp)
-                                .wrapContentSize()
-                                .noRippleClickable {
-                                    mainViewModel.getInvitesList(userData.value.uid)
-                                    navController.navigate(NavigationItem.InvitesList.route)
-                                })
+                            Text(
+                                stringResource(R.string.invitations), modifier = Modifier
+                                    .border(3.dp, PurpleGrey40, RoundedCornerShape(20.dp))
+                                    .padding(horizontal = 8.dp)
+                                    .padding(vertical = 4.dp)
+                                    .wrapContentSize()
+                                    .noRippleClickable {
+                                        mainViewModel.getInvitesList(userData.value.uid)
+                                        navController.navigate(NavigationItem.InvitesList.route)
+                                    })
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Room", modifier = Modifier
-                                .border(3.dp, PurpleGrey40, RoundedCornerShape(20.dp))
-                                .padding(horizontal = 8.dp)
-                                .padding(vertical = 4.dp)
-                                .wrapContentSize()
-                                .noRippleClickable {
-                                    navController.navigate(NavigationItem.RoomsList.route)
-                                })
+                            Text(
+                                stringResource(R.string.room), modifier = Modifier
+                                    .border(3.dp, PurpleGrey40, RoundedCornerShape(20.dp))
+                                    .padding(horizontal = 8.dp)
+                                    .padding(vertical = 4.dp)
+                                    .wrapContentSize()
+                                    .noRippleClickable {
+                                        mainViewModel.getRoomsList(userData.value.uid)
+                                        navController.navigate(NavigationItem.RoomsList.route)
+                                    })
                         }
                     }
 
@@ -140,7 +143,7 @@ class MainActivity : ComponentActivity() {
                             InviteListScreen(mainViewModel)
                         }
                         composable(NavigationItem.RoomsList.route) {
-                            RoomsListScreen(userData, db) { roomId ->
+                            RoomsListScreen(userData, db, mainViewModel) { roomId ->
                                 navController.navigate("${NavigationItem.Rooms.route}/$roomId")
                             }
                         }

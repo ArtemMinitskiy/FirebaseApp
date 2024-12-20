@@ -9,10 +9,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.example.firebaseapp.MainViewModel
 import com.example.firebaseapp.firebase.getUser
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.ROOMS
@@ -23,8 +26,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 fun RoomsListScreen(
     userData: MutableState<User>,
     db: FirebaseFirestore,
+    mainViewModel: MainViewModel,
     onChat: (String) -> Unit
 ) {
+    val usersRooms by mainViewModel.usersRooms.collectAsState()
     val rooms = remember { mutableStateListOf<User>() }
     val roomId = remember { mutableStateOf("") }
 
@@ -57,12 +62,13 @@ fun RoomsListScreen(
                 }
             }
     }
-
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.wrapContentHeight()) {
-            items(rooms) {
+            items(usersRooms) {
                 ChatView(it) {
-                    onChat(roomId.value)
+                    Log.i("mLogMessage", "${it.uid}")
+                    onChat(it.uid)
+//                    onChat(roomId.value)
                 }
             }
         }

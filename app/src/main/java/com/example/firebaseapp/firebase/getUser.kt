@@ -15,7 +15,6 @@ fun getUser(db: FirebaseFirestore, userUID: String, getUser: (User) -> Unit) {
                         email = doc.getString("email").toString(),
                         picture = doc.getString("picture").toString(),
                         name = doc.getString("name").toString(),
-                        listOfRooms = arrayListOf()
                     )
                 )
             }

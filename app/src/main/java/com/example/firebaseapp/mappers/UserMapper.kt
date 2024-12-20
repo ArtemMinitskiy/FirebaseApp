@@ -15,7 +15,6 @@ class UserMapper {
                         email = doc.getString("email").toString(),
                         picture = doc.getString("picture").toString(),
                         name = doc.getString("name").toString(),
-                        listOfRooms = arrayListOf()
                     )
                 )
             }

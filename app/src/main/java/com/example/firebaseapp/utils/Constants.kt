@@ -9,10 +9,15 @@ object Constants {
 
     //Users
     const val NAME = "name"
+    const val EMAIL = "email"
+    const val PICTURE = "picture"
 
     //Invite Status
     const val PENDING = "pending"
     const val ACCEPTED = "accepted"
+
+    //Room
+    const val CREATED_BY = "createdBy"
 
     //Invites
     const val INVITE_ID = "inviteId"
