@@ -6,13 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.firebaseapp.firebase.FirestoreRepository
 import com.example.firebaseapp.mappers.InviteMapper
+import com.example.firebaseapp.mappers.MessageMapper
 import com.example.firebaseapp.mappers.RoomMapper
 import com.example.firebaseapp.mappers.UserMapper
-import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.model.InviteTest
+import com.example.firebaseapp.model.Message
 import com.example.firebaseapp.model.RoomTest
 import com.example.firebaseapp.model.User
-import com.example.firebaseapp.utils.Constants.CREATED_BY
+import com.example.firebaseapp.utils.Constants.CONTENT
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -154,4 +155,19 @@ class MainViewModel @Inject constructor(
 
         })
     }
+
+    fun sendMessage(roomId: String, message: Message) {
+        firestoreRepository.sendMessage(roomId, message)
+    }
+
+    private val _messages = MutableStateFlow<List<String>>(listOf())
+    var messages: StateFlow<List<String>> = _messages
+    fun getMessagesList(roomId: String) {
+        firestoreRepository.getMessagesList(roomId, success = { querySnapshot ->
+            _messages.value = MessageMapper().mapMessages(querySnapshot.documents)
+        }, ex = {
+
+        })
+    }
+
 }

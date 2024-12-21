@@ -3,20 +3,22 @@ package com.example.firebaseapp.firebase
 import android.util.Log
 import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.model.InviteTest
-import com.example.firebaseapp.model.Room
+import com.example.firebaseapp.model.Message
 import com.example.firebaseapp.model.RoomTest
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.ACCEPTED
-import com.example.firebaseapp.utils.Constants.CREATED_BY
+import com.example.firebaseapp.utils.Constants.CONTENT
 import com.example.firebaseapp.utils.Constants.EMAIL
 import com.example.firebaseapp.utils.Constants.INVITATIONS
 import com.example.firebaseapp.utils.Constants.INVITE_ID
+import com.example.firebaseapp.utils.Constants.MESSAGES
 import com.example.firebaseapp.utils.Constants.NAME
 import com.example.firebaseapp.utils.Constants.PENDING
 import com.example.firebaseapp.utils.Constants.PICTURE
 import com.example.firebaseapp.utils.Constants.ROOMS
 import com.example.firebaseapp.utils.Constants.ROOM_ID
 import com.example.firebaseapp.utils.Constants.STATUS
+import com.example.firebaseapp.utils.Constants.TIMESTAMP
 import com.example.firebaseapp.utils.Constants.TO
 import com.example.firebaseapp.utils.Constants.USERS
 import com.google.firebase.auth.AuthResult
@@ -25,7 +27,6 @@ import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class FirestoreRepository @Inject constructor() {
@@ -212,6 +213,28 @@ class FirestoreRepository @Inject constructor() {
         ex: (FirebaseFirestoreException) -> Unit
     ) {
         db.collection(ROOMS)
+            .addSnapshotListener { value, e ->
+                value?.let {
+                    if (e != null) {
+                        ex(e)
+                    } else {
+                        value.let { success(it) }
+                    }
+                }
+            }
+    }
+
+    fun sendMessage(roomId: String, message: Message) {
+        db.collection(ROOMS).document(roomId).collection(MESSAGES).add(message)
+    }
+
+    fun getMessagesList(
+        roomId: String,
+        success: (QuerySnapshot) -> Unit,
+        ex: (FirebaseFirestoreException) -> Unit
+    ) {
+        db.collection(ROOMS).document(roomId).collection(MESSAGES)
+            .orderBy(TIMESTAMP)
             .addSnapshotListener { value, e ->
                 value?.let {
                     if (e != null) {

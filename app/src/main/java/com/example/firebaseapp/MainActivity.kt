@@ -144,12 +144,13 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(NavigationItem.RoomsList.route) {
                             RoomsListScreen(userData, mainViewModel) { roomId ->
+                                mainViewModel.getMessagesList(roomId)
                                 navController.navigate("${NavigationItem.Rooms.route}/$roomId")
                             }
                         }
                         composable("${NavigationItem.Rooms.route}/{$ROOM_ID}") { backStackEntry ->
                             val roomId = backStackEntry.arguments?.getString(ROOM_ID)
-                            ChatRoomScreen(userData, db, roomId)
+                            ChatRoomScreen(userData, mainViewModel, roomId)
                         }
                     }
                 }
