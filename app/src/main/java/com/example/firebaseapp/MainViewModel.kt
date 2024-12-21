@@ -9,11 +9,10 @@ import com.example.firebaseapp.mappers.InviteMapper
 import com.example.firebaseapp.mappers.MessageMapper
 import com.example.firebaseapp.mappers.RoomMapper
 import com.example.firebaseapp.mappers.UserMapper
-import com.example.firebaseapp.model.InviteTest
+import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.model.Message
-import com.example.firebaseapp.model.RoomTest
+import com.example.firebaseapp.model.Room
 import com.example.firebaseapp.model.User
-import com.example.firebaseapp.utils.Constants.CONTENT
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +20,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -56,8 +54,8 @@ class MainViewModel @Inject constructor(
         _userAuth.value = userAuth
     }
 
-    fun getUser(userUid: String, getUser: (User) -> Unit) {
-        firestoreRepository.getUser(userUid, getUser = {
+    fun getUserByUid(userUid: String, getUser: (User) -> Unit) {
+        firestoreRepository.getUserByUid(userUid, getUser = {
             getUser(it)
         })
     }
@@ -71,41 +69,19 @@ class MainViewModel @Inject constructor(
     }
 
     fun invite(
-        fromUid: String,
-        fromEmail: String,
-        fromName: String,
-        fromPicture: String,
-        toUid: String,
-        toName: String
-    ) {
-        firestoreRepository.invite(fromUid, fromEmail, fromName, fromPicture, toUid, toName)
-    }
-
-    fun invite2(
         userFrom: User,
         userTo: User
     ) {
-        firestoreRepository.invite2(userFrom, userTo)
+        firestoreRepository.invite(userFrom, userTo)
     }
 
-    private val _invites = MutableStateFlow<List<InviteTest?>>(listOf())
-    var invites: StateFlow<List<InviteTest?>> = _invites
-
-    fun getInvitesList(currentUserUid: String) {
-//        firestoreRepository.getInvitesList(currentUserUid, success = { snapshot ->
-//            snapshot.let {
-//                _invites.value = InviteMapper().mapInvite(it.documents)
-//            }
-//        }, ex = {
-//
-//        })
+    private val _invites = MutableStateFlow<List<Invite?>>(listOf())
+    var invites: StateFlow<List<Invite?>> = _invites
+    fun getInvitesList() {
         viewModelScope.launch(Dispatchers.IO) {
-            firestoreRepository.fetchInvitations(success = { querySnapshot ->
-                querySnapshot.documents.mapNotNull { document ->
-//                    document.toObject(InviteTest::class.java)?.copy(
-//                        inviteId = document.id // Ensure inviteId is set to the document ID
-//                    )
-                    _invites.value = InviteMapper().mapInvite2(querySnapshot.documents)
+            firestoreRepository.getInvitesList(success = { querySnapshot ->
+                querySnapshot.documents.mapNotNull {
+                    _invites.value = InviteMapper().mapInvite(querySnapshot.documents)
                 }
             }, ex = {
 
@@ -113,43 +89,20 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    fun createRoom(invite: InviteTest) {
+    fun createRoom(invite: Invite) {
         firestoreRepository.createRoom(invite)
     }
 
-    fun deleteInvite(invite: InviteTest) {
+    fun deleteInvite(invite: Invite) {
         firestoreRepository.deleteInvite(invite)
     }
 
-    private val _usersRooms = MutableStateFlow<List<User>>(arrayListOf())
-    var usersRooms: StateFlow<List<User>> = _usersRooms
-
-    fun getRoomsList(
-        currentUserUid: String,
-    ) {
-        firestoreRepository.getRoomsList(success = { snapshot ->
-            snapshot.let {
-                RoomMapper().mapRoom(currentUserUid, it.documents).forEach { uid ->
-                    firestoreRepository.getUserByUid(uid) { user ->
-                        _usersRooms.update { currentItems ->
-                            currentItems.toMutableList().apply {
-                                this.addAll(listOf(user))
-                            }
-                        }
-                    }
-                }
-            }
-        }, ex = {
-
-        })
-    }
-
-    private val _usersRooms2 = MutableStateFlow<List<RoomTest?>>(arrayListOf())
-    var usersRooms2: StateFlow<List<RoomTest?>> = _usersRooms2
+    private val _usersRooms = MutableStateFlow<List<Room?>>(arrayListOf())
+    var usersRooms: StateFlow<List<Room?>> = _usersRooms
     fun getRoomsList2() {
         firestoreRepository.getRoomsList(success = { querySnapshot ->
             querySnapshot.documents.mapNotNull { document ->
-                _usersRooms2.value = RoomMapper().mapRoom2(querySnapshot.documents)
+                _usersRooms.value = RoomMapper().mapRoom(querySnapshot.documents)
             }
         }, ex = {
 

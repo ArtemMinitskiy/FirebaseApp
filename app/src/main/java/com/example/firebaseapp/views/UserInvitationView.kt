@@ -20,13 +20,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.example.firebaseapp.R
-import com.example.firebaseapp.model.InviteTest
+import com.example.firebaseapp.model.Invite
 import com.example.firebaseapp.ui.theme.Blue
 import com.example.firebaseapp.ui.theme.Red
 import com.example.firebaseapp.utils.noRippleClickable
 
 @Composable
-fun UserInvitationView(invite: InviteTest?, accept: () -> Unit, reject: () -> Unit) {
+fun UserInvitationView(invite: Invite?, accept: () -> Unit, reject: () -> Unit) {
     Row(
         modifier = Modifier
             .wrapContentHeight()

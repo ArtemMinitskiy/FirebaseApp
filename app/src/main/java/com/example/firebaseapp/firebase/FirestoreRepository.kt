@@ -2,12 +2,10 @@ package com.example.firebaseapp.firebase
 
 import android.util.Log
 import com.example.firebaseapp.model.Invite
-import com.example.firebaseapp.model.InviteTest
 import com.example.firebaseapp.model.Message
-import com.example.firebaseapp.model.RoomTest
+import com.example.firebaseapp.model.Room
 import com.example.firebaseapp.model.User
 import com.example.firebaseapp.utils.Constants.ACCEPTED
-import com.example.firebaseapp.utils.Constants.CONTENT
 import com.example.firebaseapp.utils.Constants.EMAIL
 import com.example.firebaseapp.utils.Constants.INVITATIONS
 import com.example.firebaseapp.utils.Constants.INVITE_ID
@@ -19,7 +17,7 @@ import com.example.firebaseapp.utils.Constants.ROOMS
 import com.example.firebaseapp.utils.Constants.ROOM_ID
 import com.example.firebaseapp.utils.Constants.STATUS
 import com.example.firebaseapp.utils.Constants.TIMESTAMP
-import com.example.firebaseapp.utils.Constants.TO
+import com.example.firebaseapp.utils.Constants.UID
 import com.example.firebaseapp.utils.Constants.USERS
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -53,33 +51,16 @@ class FirestoreRepository @Inject constructor() {
         return usersRef.asFlow()
     }
 
-    fun getUser(userUID: String, getUser: (User) -> Unit) {
+    fun getUserByUid(userUID: String, getUser: (User) -> Unit) {
         db.collection(USERS).document(userUID)
             .addSnapshotListener { value, _ ->
                 value?.let { doc ->
                     getUser(
                         User(
-                            uid = doc.getString("uid").toString(),
-                            email = doc.getString("email").toString(),
-                            picture = doc.getString("picture").toString(),
-                            name = doc.getString("name").toString(),
-                        )
-                    )
-                }
-            }
-    }
-
-    fun getUserByUid(userUID: String, addUser: (User) -> Unit) {
-        db.collection(USERS).document(userUID)
-            .addSnapshotListener { value, _ ->
-                value?.let { doc ->
-                    Log.i("mLogRoom", "user: $doc")
-                    addUser(
-                        User(
-                            uid = doc.getString("uid").toString(),
-                            email = doc.getString("email").toString(),
-                            picture = doc.getString("picture").toString(),
-                            name = doc.getString("name").toString(),
+                            uid = doc.getString(UID).toString(),
+                            email = doc.getString(EMAIL).toString(),
+                            picture = doc.getString(PICTURE).toString(),
+                            name = doc.getString(NAME).toString(),
                         )
                     )
                 }
@@ -87,45 +68,13 @@ class FirestoreRepository @Inject constructor() {
     }
 
     fun invite(
-        fromUid: String,
-        fromEmail: String,
-        fromName: String,
-        fromPicture: String,
-        toUid: String,
-        toName: String
-    ) {
-//        Log.i("mLogFire", "Invite User: $toName")
-        val roomId = "${fromUid}_${toUid}"
-        val inviteRef = db.collection(INVITATIONS).document()
-        val inviteId = inviteRef.id
-        val invite = Invite(
-            inviteId = inviteId,
-            from = fromUid,
-            fromEmail = fromEmail,
-            fromName = fromName,
-            fromPicture = fromPicture,
-            to = toUid,
-            roomId = roomId,
-            status = PENDING
-        )
-        inviteRef.set(invite)
-            .addOnSuccessListener {
-                Log.i("mLogFire", "Send Invite to User: $invite")
-            }
-            .addOnFailureListener {
-                Log.e("mLogFire", "Failure Invite to User: $invite ${it.message}")
-            }
-    }
-
-    fun invite2(
         userFrom: User,
         userTo: User
     ) {
-//        Log.i("mLogFire", "Invite User: $toName")
         val roomId = "${userFrom.uid}_${userTo.uid}"
         val inviteRef = db.collection(INVITATIONS).document()
         val inviteId = inviteRef.id
-        val invite = InviteTest(
+        val invite = Invite(
             inviteId = inviteId,
             userFrom = userFrom,
             userTo = userTo,
@@ -142,23 +91,6 @@ class FirestoreRepository @Inject constructor() {
     }
 
     fun getInvitesList(
-        currentUserUid: String,
-        success: (QuerySnapshot) -> Unit,
-        ex: (FirebaseFirestoreException) -> Unit
-    ) {
-        db.collection(INVITATIONS)
-            .whereEqualTo(TO, currentUserUid)
-            .whereEqualTo(STATUS, PENDING).addSnapshotListener { value, e ->
-                if (e != null) {
-                    ex(e)
-                } else {
-                    value?.let { success(it) }
-                }
-            }
-    }
-
-
-    fun fetchInvitations(
         success: (QuerySnapshot) -> Unit,
         ex: (FirebaseFirestoreException) -> Unit
     ) {
@@ -175,10 +107,10 @@ class FirestoreRepository @Inject constructor() {
     }
 
 
-    fun createRoom(invite: InviteTest) {
+    fun createRoom(invite: Invite) {
         val roomRef = db.collection(ROOMS).document()
         val roomId = roomRef.id
-        val room = RoomTest(
+        val room = Room(
             roomId = roomId,
             roomName = "Private Room",
             createdBy = invite.userFrom.uid,
@@ -204,7 +136,7 @@ class FirestoreRepository @Inject constructor() {
             }
     }
 
-    fun deleteInvite(invite: InviteTest) {
+    fun deleteInvite(invite: Invite) {
         db.collection(INVITATIONS).document(invite.inviteId).delete()
     }
 

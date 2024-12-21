@@ -25,16 +25,8 @@ fun UsersListScreen(
         LazyColumn(modifier = Modifier.wrapContentHeight()) {
             items(users) {
                 UserView(it) {
-//                    mainViewModel.invite(
-//                        fromUid = userData.value.uid,
-//                        fromEmail = userData.value.email,
-//                        fromName = userData.value.name,
-//                        fromPicture = userData.value.picture,
-//                        toUid = it.uid,
-//                        toName = it.name
-//                    )
-                    mainViewModel.getUser(it.uid, getUser = { userTo ->
-                        mainViewModel.invite2(
+                    mainViewModel.getUserByUid(it.uid, getUser = { userTo ->
+                        mainViewModel.invite(
                             userFrom = userData.value,
                             userTo = userTo
                         )

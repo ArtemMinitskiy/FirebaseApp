@@ -16,16 +16,8 @@ object Constants {
     const val PENDING = "pending"
     const val ACCEPTED = "accepted"
 
-    //Room
-    const val CREATED_BY = "createdBy"
-
     //Invites
     const val INVITE_ID = "inviteId"
-    const val FROM = "from"
-    const val FROM_EMAIL = "fromEmail"
-    const val FROM_NAME = "fromName"
-    const val FROM_PICTURE = "fromPicture"
-    const val TO = "to"
     const val ROOM_ID = "roomId"
     const val STATUS = "status"
 

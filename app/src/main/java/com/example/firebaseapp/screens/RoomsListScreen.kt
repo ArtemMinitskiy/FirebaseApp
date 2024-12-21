@@ -21,7 +21,7 @@ fun RoomsListScreen(
     mainViewModel: MainViewModel,
     onChat: (String) -> Unit
 ) {
-    val usersRooms by mainViewModel.usersRooms2.collectAsState()
+    val usersRooms by mainViewModel.usersRooms.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.wrapContentHeight()) {

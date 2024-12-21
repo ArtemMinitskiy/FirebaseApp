@@ -15,11 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.firebaseapp.model.RoomTest
+import com.example.firebaseapp.model.Room
 import com.example.firebaseapp.utils.noRippleClickable
 
 @Composable
-fun ChatView(currentUserUid: String, user: RoomTest?, onClick: () -> Unit) {
+fun ChatView(currentUserUid: String, user: Room?, onClick: () -> Unit) {
     user?.let {
         Row(
             modifier = Modifier

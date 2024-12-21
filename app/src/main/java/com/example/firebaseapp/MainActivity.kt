@@ -90,7 +90,6 @@ class MainActivity : ComponentActivity() {
                         }
                         Row(
                             modifier = Modifier
-//                                .background(Orange)
                                 .wrapContentHeight()
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp)
@@ -103,7 +102,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(vertical = 4.dp)
                                     .wrapContentSize()
                                     .noRippleClickable {
-                                        mainViewModel.getInvitesList(userData.value.uid)
+                                        mainViewModel.getInvitesList()
                                         navController.navigate(NavigationItem.InvitesList.route)
                                     })
                             Spacer(modifier = Modifier.width(8.dp))
